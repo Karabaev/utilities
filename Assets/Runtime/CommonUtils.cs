@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Object = UnityEngine.Object;
 
 namespace com.karabaev.utilities
 {
@@ -83,17 +82,6 @@ namespace com.karabaev.utilities
         throw new NullReferenceException($"Entry with key {key} not found in dictionary");
 
       return result!;
-    }
-
-    public static T? AsNullable<T>(this T? reference) where T : class
-    {
-      if(reference == null || reference.Equals(null))
-        return null;
-
-      if(reference is Object unityObject)
-        return unityObject ? reference : null;
-
-      return reference;
     }
 
     public static string Capitalize(this string source) =>

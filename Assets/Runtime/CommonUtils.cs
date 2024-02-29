@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace com.karabaev.utilities
@@ -101,5 +102,30 @@ namespace com.karabaev.utilities
     }
 
     public static TimeSpan ToSeconds(this float seconds) => TimeSpan.FromSeconds(seconds);
+    
+    public static async ValueTask<IReadOnlyList<T>> WhenAll<T>(ValueTask<T>[] source)
+    {
+      var result = new List<T>(source.Length);
+      List<Exception>? exceptions = null;
+
+      for (var i = 0; i < source.Length; i++)
+      {
+        try
+        {
+          var taskResult = await source[i].ConfigureAwait(false);
+          result.Add(taskResult);
+        }
+        catch(Exception ex)
+        {
+          exceptions ??= new(source.Length);
+          exceptions.Add(ex);
+        }
+      }
+
+      if (exceptions is not null)
+        throw new AggregateException(exceptions);
+
+      return result;
+    }
   }
 }

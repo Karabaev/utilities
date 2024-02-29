@@ -103,21 +103,21 @@ namespace com.karabaev.utilities
 
     public static TimeSpan ToSeconds(this float seconds) => TimeSpan.FromSeconds(seconds);
     
-    public static async ValueTask<IReadOnlyList<T>> WhenAll<T>(ValueTask<T>[] source)
+    public static async ValueTask<IReadOnlyList<T>> WhenAll<T>(IReadOnlyList<ValueTask<T>> tasks)
     {
-      var result = new List<T>(source.Length);
+      var result = new List<T>(tasks.Count);
       List<Exception>? exceptions = null;
 
-      for (var i = 0; i < source.Length; i++)
+      foreach(var task in tasks)
       {
         try
         {
-          var taskResult = await source[i].ConfigureAwait(false);
+          var taskResult = await task.ConfigureAwait(false);
           result.Add(taskResult);
         }
         catch(Exception ex)
         {
-          exceptions ??= new(source.Length);
+          exceptions ??= new(tasks.Count);
           exceptions.Add(ex);
         }
       }

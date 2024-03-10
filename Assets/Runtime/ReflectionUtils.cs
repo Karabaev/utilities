@@ -7,18 +7,18 @@ namespace com.karabaev.utilities
 {
   public static class ReflectionUtils
   {
-    public static IEnumerable<(Type, TAttribute)> FindAllTypesWithAttribute<TAttribute>(IReadOnlyList<string> assemblyNames)
+    public static IEnumerable<(Type, TAttribute)> FindAllTypesWithAttribute<TAttribute>(AssembliesCollection assemblies)
       where TAttribute : Attribute
     {
-      return GetTypesFromAssemblies(assemblyNames).Select(t => (t, t.GetCustomAttribute<TAttribute>())).Where(t => t.Item2 != null);
+      return GetTypesFromAssemblies(assemblies).Select(t => (t, t.GetCustomAttribute<TAttribute>())).Where(t => t.Item2 != null);
     }
 
-    public static IEnumerable<Type> FindAllTypesWithInterface<TInterface>(IReadOnlyList<string> assemblyNames)
+    public static IEnumerable<Type> FindAllTypesWithInterface<TInterface>(AssembliesCollection assemblies)
     {
-      return GetTypesFromAssemblies(assemblyNames).Where(t => t.GetInterfaces().Contains(typeof(TInterface)));
+      return GetTypesFromAssemblies(assemblies).Where(t => t.GetInterfaces().Contains(typeof(TInterface)));
     }
 
-    public static IEnumerable<(Type, TAttribute)> FindAllTypesWithAttributeAndInterface<TAttribute, TInterface>(params string[] assemblies)
+    public static IEnumerable<(Type, TAttribute)> FindAllTypesWithAttributeAndInterface<TAttribute, TInterface>(AssembliesCollection assemblies)
       where TAttribute : Attribute
     {
       return GetTypesFromAssemblies(assemblies)
@@ -27,10 +27,10 @@ namespace com.karabaev.utilities
        .Where(t => t.Item2 != null);
     }
 
-    public static IEnumerable<(Type, TAttribute)> FindAllTypesWithAttributeAndBaseType<TAttribute, TBase>(IReadOnlyList<string> assemblyNames)
+    public static IEnumerable<(Type, TAttribute)> FindAllTypesWithAttributeAndBaseType<TAttribute, TBase>(AssembliesCollection assemblies)
       where TAttribute : Attribute
     {
-      return GetTypesFromAssemblies(assemblyNames)
+      return GetTypesFromAssemblies(assemblies)
        .Where(t =>
         {
           var baseType = t.BaseType;
@@ -48,9 +48,9 @@ namespace com.karabaev.utilities
        .Where(t => t.Item2 != null);
     }
 
-    private static IEnumerable<Type> GetTypesFromAssemblies(IReadOnlyList<string> assemblyNames)
+    private static IEnumerable<Type> GetTypesFromAssemblies(AssembliesCollection assemblies)
     {
-      return assemblyNames.Select(Assembly.Load).SelectMany(a => a.GetTypes());
+      return assemblies.Assemblies.Select(Assembly.Load).SelectMany(a => a.GetTypes());
     }
 
     public static TAttribute RequireAttribute<TAttribute>(Type sourceType)
@@ -85,6 +85,13 @@ namespace com.karabaev.utilities
       }
 
       return false;
+    }
+    
+    public class AssembliesCollection
+    {
+      public IReadOnlyList<string> Assemblies { get; }
+
+      public AssembliesCollection(IReadOnlyList<string> assemblies) => Assemblies = assemblies;
     }
   }
 }

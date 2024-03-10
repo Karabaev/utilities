@@ -92,6 +92,8 @@ namespace com.karabaev.utilities
       public IReadOnlyList<string> Assemblies { get; }
 
       public AssembliesCollection(IReadOnlyList<string> assemblies) => Assemblies = assemblies;
+      
+      public AssembliesCollection(params string[] assemblies) => Assemblies = assemblies;
     }
   }
 }

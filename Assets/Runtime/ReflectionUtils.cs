@@ -107,7 +107,21 @@ namespace com.karabaev.utilities
         .GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!
         .Invoke(target, args);
     }
-    
+
+    public static void TryCallPrivateMethod(this object target, string methodName, params object[] args)
+    {
+      var methodInfo = target.GetType()
+        .GetMethod(methodName, 
+          BindingFlags.Instance | BindingFlags.NonPublic, 
+          null,
+          args.Select(a => a.GetType()).ToArray(),
+          null);
+      if (methodInfo == null)
+        return;
+      
+      methodInfo.Invoke(target, args);
+    }
+
     public class AssembliesCollection
     {
       public IReadOnlyList<string> Assemblies { get; }

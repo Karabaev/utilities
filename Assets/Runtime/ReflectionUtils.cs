@@ -87,6 +87,27 @@ namespace com.karabaev.utilities
       return false;
     }
     
+    public static TValue GetPrivateField<TSource, TValue>(this TSource source, string fieldName)
+    {
+      return (TValue) typeof(TSource)
+        .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
+        .GetValue(source);
+    }
+
+    public static void SetPrivateField(this object target, string fieldName, object value)
+    {
+      target.GetType()
+        .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
+        .SetValue(target, value);
+    }
+    
+    public static void CallPrivateMethod(this object target, string methodName, params object[] args)
+    {
+      target.GetType()
+        .GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic)!
+        .Invoke(target, args);
+    }
+    
     public class AssembliesCollection
     {
       public IReadOnlyList<string> Assemblies { get; }

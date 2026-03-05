@@ -56,10 +56,31 @@ namespace com.karabaev.utilities
     public static TAttribute RequireAttribute<TAttribute>(Type sourceType)
       where TAttribute : Attribute
     {
-      var attribute = sourceType.GetCustomAttribute<TAttribute>();
-      return attribute ??
-        throw new
-          NullReferenceException($"There is no attribute on specified type. SourceType={sourceType.Name}. AttributeType={typeof(TAttribute).Name}");
+      if (TryGetAttribute<TAttribute>(sourceType, out var attribute)) return attribute!;
+        
+      throw new NullReferenceException($"There is no attribute on specified type. SourceType={sourceType.Name}. AttributeType={typeof(TAttribute).Name}");
+    }
+    
+    public static bool TryGetAttribute<TAttribute>(Type type, out TAttribute? attribute)
+      where TAttribute : Attribute
+    {
+      attribute = type.GetCustomAttribute<TAttribute>();
+      return attribute != null;
+    }
+    
+    public static TAttribute RequireAttribute<TAttribute>(this MemberInfo field)
+      where TAttribute : Attribute
+    {
+      if (field.TryGetAttribute<TAttribute>(out var attribute)) return attribute!;
+      
+      throw new NullReferenceException($"There is no attribute on specified member. MemberName={field.Name}. AttributeType={typeof(TAttribute).Name}");
+    }
+
+    public static bool TryGetAttribute<TAttribute>(this MemberInfo field, out TAttribute? attribute)
+      where TAttribute : Attribute
+    {
+      attribute = field.GetCustomAttribute<TAttribute>();
+      return attribute != null;
     }
 
     public static bool IsInterfaceImplemented<TInterface>(this Type type)

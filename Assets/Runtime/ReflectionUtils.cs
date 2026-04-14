@@ -108,10 +108,20 @@ namespace com.karabaev.utilities
       return false;
     }
     
-    public static TValue GetPrivateField<TSource, TValue>(this TSource source, string fieldName)
+    public static TValue GetPublicField<TValue>(this object source, string fieldName)
     {
-      return (TValue) typeof(TSource)
-        .GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic)!
+      return source.GetField<TValue>(fieldName, BindingFlags.Instance | BindingFlags.Public);
+    }
+    
+    public static TValue GetPrivateField<TValue>(this object source, string fieldName)
+    {
+      return source.GetField<TValue>(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+    }
+
+    public static TValue GetField<TValue>(this object source, string fieldName, BindingFlags bindingAttr)
+    {
+      return (TValue) source.GetType()
+        .GetField(fieldName, bindingAttr)!
         .GetValue(source);
     }
 

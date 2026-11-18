@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace com.karabaev.utilities
 {
+  [PublicAPI]
   public static class CollectionUtils
   {
     public static T[] With<T>(this T[] collection, params T[] items)
@@ -23,6 +25,34 @@ namespace com.karabaev.utilities
       return -1;
     }
 
+    public static IEnumerable<TItem> Where<TItem, TState>(
+      this IReadOnlyList<TItem> list,
+      TState state,
+      Func<TState, TItem, bool> predicate)
+    {
+      for (var i = 0; i < list.Count; i++)
+      {
+        var item = list[i];
+        if (predicate.Invoke(state, item))
+        {
+          yield return item;
+        }
+      }
+    }
+    
+    public static int IndexOf<TItem, TState>(
+      this IReadOnlyList<TItem> list,
+      TState state,
+      Func<TState, TItem, bool> predicate)
+    {
+      for (var i = 0; i < list.Count; i++)
+      {
+        if (predicate.Invoke(state, list[i])) return i;
+      }
+      
+      return -1;
+    }
+    
     public static float Sum<TSource>(this TSource[] source, Func<TSource, float> selector)
     {
       var sum = 0.0f;
